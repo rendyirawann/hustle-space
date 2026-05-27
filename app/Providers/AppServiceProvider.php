@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             try {
                 if (Schema::hasTable('subscriptions')) {
                     $subs = \App\Models\Subscription::with('user')->latest()->take(5)->get()->map(function ($s) {
-                        $name = $s->user->name ?? 'User';
+                        $name = $s->user?->name ?? 'User';
                         return [
                             'message' => "{$name} joined a plan",
                             'time' => $s->created_at,
@@ -71,7 +71,7 @@ class AppServiceProvider extends ServiceProvider
 
                 if (Schema::hasTable('custom_frames')) {
                     $frames = \App\Models\CustomFrame::with('user')->latest()->take(5)->get()->map(function ($f) {
-                        $name = $f->user->name ?? 'User';
+                        $name = $f->user?->name ?? 'User';
                         $action = $f->is_public ? 'published' : 'created';
                         $color = $f->is_public ? 'info' : 'warning';
                         return [
