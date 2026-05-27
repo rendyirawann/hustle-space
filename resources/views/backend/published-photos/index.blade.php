@@ -18,7 +18,7 @@
                 <div class="col-md-4 col-lg-3">
                     <div class="card shadow-sm">
                         <div class="card-body p-0">
-                            <img src="{{ Storage::url($photo->image_path) }}" alt="Photo" class="w-100" style="border-top-left-radius: 0.625rem; border-top-right-radius: 0.625rem; height: 200px; object-fit: cover;">
+                            <img src="{{ asset('storage/' . $photo->image_path) }}" alt="Photo" class="w-100" style="border-top-left-radius: 0.625rem; border-top-right-radius: 0.625rem; height: 200px; object-fit: cover;">
                         </div>
                         <div class="card-footer p-4 d-flex justify-content-between align-items-center">
                             <div>

@@ -285,8 +285,8 @@
     <!-- Gallery -->
     <div class="gallery-container">
         @forelse($photos as $photo)
-        <div class="gallery-item" onclick="openLightbox('{{ Storage::url($photo->image_path) }}')">
-            <img src="{{ Storage::url($photo->image_path) }}" alt="Hustle Moment" loading="lazy">
+        <div class="gallery-item" onclick="openLightbox('{{ asset('storage/' . $photo->image_path) }}')">
+            <img src="{{ asset('storage/' . $photo->image_path) }}" alt="Hustle Moment" loading="lazy">
             <div class="overlay">
                 <div class="user-info">
                     {{ $photo->user ? $photo->user->name : 'Guest User' }}
