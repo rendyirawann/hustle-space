@@ -378,6 +378,69 @@
             color: var(--text-muted);
             font-size: 0.9rem;
         }
+        /* Mobile Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            margin-left: auto;
+            z-index: 1001;
+        }
+        .hamburger span {
+            width: 30px;
+            height: 3px;
+            background-color: var(--text-main);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background-color: var(--card-bg);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2rem;
+                transition: left 0.3s ease;
+                border-top: 1px solid var(--border-color);
+            }
+            .nav-links.active {
+                left: 0;
+            }
+            .nav-links .btn {
+                margin-left: 0 !important;
+                width: 80%;
+                text-align: center;
+            }
+            .hero {
+                padding: 8rem 5% 4rem;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -400,14 +463,22 @@
             <img class="img-light" src="{{ asset('assets/hustle/hustle-space-logo-white.png') }}" alt="HustleSpace Logo" style="height: 40px;">
             <img class="img-dark" src="{{ asset('assets/hustle/hustle-space-logo.png') }}" alt="HustleSpace Logo" style="height: 40px;">
         </a>
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
+        
+        <button class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#features" class="nav-item">Features</a>
+            <a href="#pricing" class="nav-item">Pricing</a>
+            <a href="{{ route('gallery.index') }}" class="nav-item">Moments</a>
             <button id="themeToggle" class="theme-toggle">
                 <span class="icon-light">🌙</span>
             </button>
-            <a href="{{ url('/hustle-posed') }}" class="btn btn-outline" style="margin-left: 1.5rem;">Coba Demo</a>
-            <a href="{{ url('/hustle-posed/login') }}" class="btn btn-primary" style="margin-left: 0.5rem;">Login</a>
+            <a href="{{ url('/hustle-posed') }}" class="btn btn-outline nav-item" style="margin-left: 1.5rem;">Coba Demo</a>
+            <a href="{{ url('/hustle-posed/login') }}" class="btn btn-primary nav-item" style="margin-left: 0.5rem;">Login</a>
         </div>
     </nav>
 
@@ -497,6 +568,21 @@
     </footer>
 
     <script>
+        // Hamburger Menu Logic
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navLinks.classList.remove('active');
+        }));
+
         // Theme toggle logic
         const themeToggle = document.getElementById('themeToggle');
         const iconLight = themeToggle.querySelector('.icon-light');

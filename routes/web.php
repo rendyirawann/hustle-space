@@ -82,6 +82,11 @@ Route::get('/api/photobooth/custom-frames', [CustomFrameController::class, 'getL
 
 // Photobooth internal API limits
 use App\Http\Controllers\Frontend\PhotoboothController;
+use App\Http\Controllers\Frontend\GalleryController;
+
+// Public routes for Spotlight Gallery
+Route::get('/hustle-moments', [GalleryController::class, 'index'])->name('gallery.index');
+Route::post('/api/photobooth/publish', [GalleryController::class, 'publish'])->name('photobooth.publish');
 Route::post('/api/photobooth/capture', [PhotoboothController::class, 'checkCapture'])->name('photobooth.capture');
 Route::post('/api/photobooth/download', [PhotoboothController::class, 'checkDownload'])->name('photobooth.download');
 Route::post('/api/photobooth/ai-enhance', [\App\Http\Controllers\Backend\AIEnhanceController::class, 'enhance']);
@@ -137,6 +142,10 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     Route::get('/admin/my-account', [AccountController::class, 'index'])->name('account.index');
     Route::get('/admin/my-account/{id}/avatar', [AccountController::class, 'editAvatar'])->name('avatar-edit');
     Route::post('/admin/my-account/{id}/update-avatar', [AccountController::class, 'updateAvatar'])->name('avatar-update');
+
+    // --- PUBLISHED PHOTOS (Admin moderation) ---
+    Route::get('/admin/published-photos', [\App\Http\Controllers\Backend\PublishedPhotoController::class, 'index'])->name('published-photos.index');
+    Route::delete('/admin/published-photos/{id}', [\App\Http\Controllers\Backend\PublishedPhotoController::class, 'destroy'])->name('published-photos.destroy');
 
     Route::resource('/admin/my-profile', ProfileController::class);
     Route::resource('/admin/my-security', SecurityController::class);

@@ -140,6 +140,22 @@
             margin-bottom: 1.5rem;
             font-size: 0.875rem;
         }
+
+        @media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+            .login-container {
+                padding: 1rem;
+            }
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+            .logo-wrapper h1 {
+                font-size: 1.25rem;
+            }
+        }
     </style>
 </head>
 <body>

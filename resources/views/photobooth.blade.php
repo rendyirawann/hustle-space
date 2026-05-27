@@ -732,8 +732,24 @@
 
         /* Responsive Breakpoints */
         @media (max-width: 900px) {
+            body {
+                overflow-y: auto !important;
+                height: auto;
+                min-height: 100dvh;
+            }
             .wizard-app-layout {
                 flex-direction: column;
+                height: auto;
+                flex: none;
+                overflow: visible;
+            }
+            .wizard-main-area, .wizard-content {
+                overflow: visible;
+                height: auto;
+            }
+            .wizard-main {
+                overflow-y: visible;
+                height: auto;
             }
             .wizard-sidebar {
                 width: 100%;
@@ -743,6 +759,7 @@
                 flex-direction: row;
                 overflow-x: auto;
                 white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
             }
             .steps-container {
                 flex-direction: row;
@@ -998,6 +1015,7 @@
                 <div style="flex:1;"></div>
                 <button class="btn btn-outline" id="btn-restart" style="display: none; margin-right: 15px;">Mulai Baru</button>
                 <button class="btn btn-primary" id="btn-next">Lanjut →</button>
+                <button class="btn" id="btn-publish" style="display: none; align-items:center; justify-content:center; background-color: var(--secondary); color: white;">🌐 Publish ke Moments</button>
                 <button class="btn btn-primary" id="btn-download" style="display: none; align-items:center; justify-content:center;">↓ Download Foto</button>
             </div>
         </main>
@@ -2198,6 +2216,72 @@
 
             finalizeLayout();
         }
+
+        // Publish logic
+        btnPublish.addEventListener('click', async () => {
+            Swal.fire({
+                title: 'Publish ke Moments?',
+                text: "Foto Anda akan ditampilkan di galeri publik HustleSpace. Semua orang dapat melihatnya.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--primary)',
+                cancelButtonColor: 'var(--text-muted)',
+                confirmButtonText: 'Ya, Publish!',
+                cancelButtonText: 'Batal',
+                background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
+                color: 'var(--text-main)'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const originalHTML = btnPublish.innerHTML;
+                    btnPublish.innerHTML = `<svg style="animation: spin 1s linear infinite; height: 1.2rem; width: 1.2rem; margin-right: 8px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...`;
+                    btnPublish.disabled = true;
+
+                    try {
+                        const finalDataUrl = finalCanvas.toDataURL('image/png', 1.0);
+                        const res = await fetch(`{{ url('/api/photobooth/publish') }}`, {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': state.csrfToken,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ image: finalDataUrl, mode: state.mode })
+                        });
+
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                            btnPublish.innerHTML = `✅ Telah Dipublish`;
+                            btnPublish.style.backgroundColor = 'var(--text-muted)';
+                            btnPublish.style.cursor = 'not-allowed';
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Foto Anda telah dipublish ke Hustle Moments.',
+                                icon: 'success',
+                                confirmButtonColor: 'var(--primary)',
+                                background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
+                                color: 'var(--text-main)'
+                            });
+                        } else {
+                            btnPublish.innerHTML = originalHTML;
+                            btnPublish.disabled = false;
+                            Swal.fire({
+                                title: 'Gagal',
+                                text: data.message || 'Gagal mempublish foto.',
+                                icon: 'error',
+                                confirmButtonColor: 'var(--primary)',
+                                background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
+                                color: 'var(--text-main)'
+                            });
+                        }
+                    } catch (e) {
+                        btnPublish.innerHTML = originalHTML;
+                        btnPublish.disabled = false;
+                        console.error('Publish error', e);
+                    }
+                }
+            });
+        });
 
         // Download logic
         btnDownload.addEventListener('click', async () => {
