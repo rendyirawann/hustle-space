@@ -406,8 +406,8 @@
             <button id="themeToggle" class="theme-toggle">
                 <span class="icon-light">🌙</span>
             </button>
-            <a href="/hustle-posed" class="btn btn-outline" style="margin-left: 1.5rem;">Coba Demo</a>
-            <a href="/hustle-posed/login" class="btn btn-primary" style="margin-left: 0.5rem;">Login</a>
+            <a href="{{ url('/hustle-posed') }}" class="btn btn-outline" style="margin-left: 1.5rem;">Coba Demo</a>
+            <a href="{{ url('/hustle-posed/login') }}" class="btn btn-primary" style="margin-left: 0.5rem;">Login</a>
         </div>
     </nav>
 
@@ -458,7 +458,7 @@
                     <li>Export Foto Resolusi Standar</li>
                     <li>Watermark HustleSpace</li>
                 </ul>
-                <a href="/hustle-posed/login" class="btn btn-outline">Mulai Sekarang</a>
+                <a href="{{ url('/hustle-posed/login') }}" class="btn btn-outline">Mulai Sekarang</a>
             </div>
 
             <!-- Pro Plan -->
@@ -473,7 +473,7 @@
                     <li>Tanpa Watermark</li>
                     <li>Dashboard Analytics</li>
                 </ul>
-                <a href="/hustle-posed/login" class="btn btn-primary">Pilih Pro</a>
+                <a href="{{ url('/hustle-posed/login') }}" class="btn btn-primary">Pilih Pro</a>
             </div>
 
             <!-- Enterprise -->
@@ -486,7 +486,7 @@
                     <li>Custom Domain</li>
                     <li>Prioritas Dukungan 24/7</li>
                 </ul>
-                <a href="/hustle-posed/login" class="btn btn-outline">Hubungi Kami</a>
+                <a href="{{ url('/hustle-posed/login') }}" class="btn btn-outline">Hubungi Kami</a>
             </div>
 
         </div>

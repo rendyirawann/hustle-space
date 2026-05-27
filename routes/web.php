@@ -84,6 +84,7 @@ Route::get('/api/photobooth/custom-frames', [CustomFrameController::class, 'getL
 use App\Http\Controllers\Frontend\PhotoboothController;
 Route::post('/api/photobooth/capture', [PhotoboothController::class, 'checkCapture'])->name('photobooth.capture');
 Route::post('/api/photobooth/download', [PhotoboothController::class, 'checkDownload'])->name('photobooth.download');
+Route::post('/api/photobooth/ai-enhance', [\App\Http\Controllers\Backend\AIEnhanceController::class, 'enhance']);
 
 Route::any('/dine-sync-pos', function () {
     return redirect('/admin/login');

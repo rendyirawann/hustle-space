@@ -1285,7 +1285,48 @@
             }
         }
 
-        btnNext.addEventListener('click', () => {
+        btnNext.addEventListener('click', async () => {
+            if (state.currentStep === 2) {
+                if (state.capturedImages.length < state.layout) {
+                    Swal.fire({
+                        title: 'Belum Selesai',
+                        text: 'Silakan ambil semua foto terlebih dahulu sebelum lanjut.',
+                        icon: 'warning',
+                        confirmButtonColor: 'var(--primary)',
+                        background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
+                        color: 'var(--text-main)'
+                    });
+                    return;
+                }
+                
+                const loadingSwal = Swal.fire({
+                    title: '✨ AI Processing',
+                    html: 'Meningkatkan resolusi dan ketajaman foto Anda...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
+                    color: 'var(--text-main)'
+                });
+
+                try {
+                    const res = await fetch(`{{ url('/api/photobooth/ai-enhance') }}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrfToken },
+                        body: JSON.stringify({ images: state.capturedImages, is_pro: state.mode === 'pro' })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        state.capturedImages = data.images;
+                    }
+                } catch (e) {
+                    console.error("AI Enhance error", e);
+                } finally {
+                    loadingSwal.close();
+                }
+            }
+
             if (state.currentStep < state.totalSteps) {
                 state.currentStep++;
                 saveState();
