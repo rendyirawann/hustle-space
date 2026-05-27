@@ -15,7 +15,7 @@
 									</button>
 									<!--end::Aside toggle-->
 									<!--begin::Header Logo-->
-									<a href="{{ route('admin.dashboard') }}">
+									<a href="{{ route('dashboard') }}">
 										<img alt="Logo" src="{{ asset('assets/hustle/hustle-space-logo.png') }}" class="h-30px" />
 									</a>
 									<!--end::Header Logo-->
