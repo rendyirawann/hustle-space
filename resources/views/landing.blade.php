@@ -459,7 +459,7 @@
 
     <!-- Navbar -->
     <nav class="navbar">
-        <a href="/" class="logo">
+        <a href="{{ url('/') }}" class="logo">
             <img class="img-light" src="{{ asset('assets/hustle/hustle-space-logo-white.png') }}" alt="HustleSpace Logo" style="height: 40px;">
             <img class="img-dark" src="{{ asset('assets/hustle/hustle-space-logo.png') }}" alt="HustleSpace Logo" style="height: 40px;">
         </a>

@@ -127,9 +127,20 @@ Route::get('/admin/debug-session', function () {
 // NOTE: Route /login POST dihapus dari sini karena sudah ada di auth.php
 // agar tidak bentrok "Route [login] defined twice".
 
-// Group Middleware untuk User yang sudah Login
-// Kita tambahkan 'forbid-banned-user' agar user yang di-banned tidak bisa akses
+// Group Middleware untuk User yang sudah Login (Umum)
 Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
+    // Override logout route redirect untuk photobooth pro
+    Route::post('/hustle-posed/logout', function (\Illuminate\Http\Request $request) {
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/hustle-posed');
+    })->name('hustle-posed.logout');
+});
+
+// Group Middleware untuk Admin (Superadmin & admin)
+// Kita tambahkan role:Superadmin|admin agar pro user tidak bisa masuk ke admin dashboard
+Route::middleware(['auth', 'forbid-banned-user', 'role:Superadmin|admin'])->group(function () {
 
     // --- SHARED ROLE ROUTES (generate-permissions helper, select) ---
     Route::post('/admin/roles/generate-permissions', [RoleController::class, 'generatePermissions'])->name('roles.generate');
@@ -152,13 +163,6 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     Route::post('/admin/my-security', [SecurityController::class, 'store'])->name('change.password');
     Route::post('/admin/my-security/logout-other-devices', [SecurityController::class, 'logoutOtherDevices'])->name('security.logout-other-devices');
     
-    // Override logout route redirect
-    Route::post('/hustle-posed/logout', function (\Illuminate\Http\Request $request) {
-        \Illuminate\Support\Facades\Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/hustle-posed');
-    })->name('hustle-posed.logout');
 
     Route::get('/admin/my-activity', [ActivityController::class, 'index'])->name('my-activity.index');
     Route::get('/admin/mget-my-activity', [ActivityController::class, 'getActivity'])->name('get-my-activity');

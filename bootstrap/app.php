@@ -26,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $request->is('hustle-posed-pro*') ? route('hustle-posed.login') : route('login')
         );
 
+        $middleware->redirectUsersTo(fn (\Illuminate\Http\Request $request) =>
+            $request->user()->hasAnyRole(['Superadmin', 'admin']) ? route('dashboard') : route('hustle-posed.pro')
+        );
+
         // 🔥 TAMBAHKAN BARIS INI (Agar logoutOtherDevices berfungsi)
         $middleware->web(append: [
             \Illuminate\Session\Middleware\AuthenticateSession::class,
