@@ -1486,22 +1486,37 @@
 
             // API Check Limit (Only for first photo to save API calls)
             if (state.capturedImages.length === 0) {
-                const res = await fetch(`/api/photobooth/capture`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrfToken },
-                    body: JSON.stringify({ mode: state.mode })
-                });
-                const data = await res.json();
-                if (!res.ok || !data.allowed) {
-                    Swal.fire({
-                        title: 'Limit Tercapai',
-                        text: data.message || 'Limit harian penggunaan tercapai.',
-                        icon: 'info',
-                        confirmButtonColor: 'var(--primary)',
-                        background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
-                        color: 'var(--text-main)'
+                try {
+                    const res = await fetch(`{{ url('/api/photobooth/capture') }}`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'X-CSRF-TOKEN': state.csrfToken,
+                            'Accept': 'application/json' 
+                        },
+                        body: JSON.stringify({ mode: state.mode })
                     });
-                    return;
+                    
+                    if (!res.ok) {
+                        console.error('Network response was not ok:', res.status, res.statusText);
+                    } else {
+                        const data = await res.json();
+                        if (!data.allowed) {
+                            Swal.fire({
+                                title: 'Limit Tercapai',
+                                text: data.message || 'Limit harian penggunaan tercapai.',
+                                icon: 'info',
+                                confirmButtonColor: 'var(--primary)',
+                                background: document.documentElement.classList.contains('theme-dark') ? 'var(--card-bg)' : '#fff',
+                                color: 'var(--text-main)'
+                            });
+                            return;
+                        }
+                    }
+                } catch(e) {
+                    console.error("Gagal mengecek limit API", e);
+                    // Lanjutkan saja jika API gagal karena mungkin internet/server sedang error ringan
                 }
             }
 
