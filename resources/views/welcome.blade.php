@@ -20,20 +20,87 @@
         @endif
     </head>
     <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-        <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
+        <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden relative">
             @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <img src="{{ asset('assets/hustle/hustle-space-logo.png') }}" alt="HustleSpace Logo" class="h-8 w-auto">
+                    </div>
+                    <!-- Hamburger Button -->
+                    <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#1b1b18] dark:text-[#EDEDEC] focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <!-- Desktop Nav -->
+                    <nav class="hidden lg:flex items-center justify-end gap-4">
+                        @auth
+                            <a
+                                href="{{ route('gallery.index') }}"
+                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
+                            >
+                                Hustle Moments
+                            </a>
+
+                            <a
+                                href="{{ url('/dashboard') }}"
+                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
+                            >
+                                Dashboard
+                            </a>
+                        @else
+                            <a
+                                href="{{ route('gallery.index') }}"
+                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
+                            >
+                                Hustle Moments
+                            </a>
+
+                            <a
+                                href="{{ route('login') }}"
+                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
+                            >
+                                Log in
+                            </a>
+
+                            @if (Route::has('register'))
+                                <a
+                                    href="{{ route('register') }}"
+                                    class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
+                                    Register
+                                </a>
+                            @endif
+                        @endauth
+                    </nav>
+                </div>
+
+                <!-- Mobile Nav -->
+                <nav id="mobile-menu" class="hidden lg:hidden flex-col items-start gap-4 mt-4 bg-[#FDFDFC] dark:bg-[#161615] border border-[#e3e3e0] dark:border-[#3E3E3A] rounded-lg p-4 shadow-lg absolute right-0 z-50 w-48">
                     @auth
                         <a
+                            href="{{ route('gallery.index') }}"
+                            class="block w-full py-2 dark:text-[#EDEDEC] text-[#1b1b18] font-medium"
+                        >
+                            Hustle Moments
+                        </a>
+
+                        <a
                             href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
+                            class="block w-full py-2 dark:text-[#EDEDEC] text-[#1b1b18] font-medium"
                         >
                             Dashboard
                         </a>
                     @else
                         <a
+                            href="{{ route('gallery.index') }}"
+                            class="block w-full py-2 dark:text-[#EDEDEC] text-[#1b1b18] font-medium"
+                        >
+                            Hustle Moments
+                        </a>
+
+                        <a
                             href="{{ route('login') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
+                            class="block w-full py-2 dark:text-[#EDEDEC] text-[#1b1b18] font-medium"
                         >
                             Log in
                         </a>
@@ -41,12 +108,25 @@
                         @if (Route::has('register'))
                             <a
                                 href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
+                                class="block w-full py-2 dark:text-[#EDEDEC] text-[#1b1b18] font-medium">
                                 Register
                             </a>
                         @endif
                     @endauth
                 </nav>
+                
+                <script>
+                    document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                        const menu = document.getElementById('mobile-menu');
+                        if (menu.classList.contains('hidden')) {
+                            menu.classList.remove('hidden');
+                            menu.classList.add('flex');
+                        } else {
+                            menu.classList.add('hidden');
+                            menu.classList.remove('flex');
+                        }
+                    });
+                </script>
             @endif
         </header>
         <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">

@@ -1092,6 +1092,7 @@
         const btnNext = document.getElementById('btn-next');
         const btnBack = document.getElementById('btn-back');
         const btnDownload = document.getElementById('btn-download');
+        const btnPublish = document.getElementById('btn-publish');
         const btnRestart = document.getElementById('btn-restart');
         
         // Navigation Logic
@@ -1164,10 +1165,12 @@
             if (state.currentStep === 5) {
                 btnNext.style.display = 'none';
                 btnDownload.style.display = 'inline-flex';
+                btnPublish.style.display = 'inline-flex';
                 btnRestart.style.display = 'inline-flex';
             } else {
                 btnNext.style.display = 'inline-flex';
                 btnDownload.style.display = 'none';
+                btnPublish.style.display = 'none';
                 btnRestart.style.display = 'none';
             }
 
@@ -1239,7 +1242,7 @@
                         opts.style.display = 'none';
                     };
 
-                    fetch(`/api/photobooth/custom-frames?mode=${state.mode}`)
+                    fetch(`{{ url('/api/photobooth/custom-frames') }}?mode=${state.mode}`)
                         .then(res => res.json())
                         .then(data => {
                             state.customFramesData = data.frames.filter(f => f.layout === state.layout);
@@ -1329,7 +1332,7 @@
                 });
 
                 try {
-                    const res = await fetch(`{{ url('/api/photobooth/ai-enhance') }}`, {
+                    const res = await fetch('{{ url("/api/photobooth/ai-enhance") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrfToken },
                         body: JSON.stringify({ images: state.capturedImages, is_pro: state.mode === 'pro' })
@@ -1505,7 +1508,7 @@
             // API Check Limit (Only for first photo to save API calls)
             if (state.capturedImages.length === 0) {
                 try {
-                    const res = await fetch(`{{ url('/api/photobooth/capture') }}`, {
+                    const res = await fetch('{{ url("/api/photobooth/capture") }}', {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: { 
@@ -1979,7 +1982,11 @@
                         const dy = H * (d.y_percent / 100);
                         mc.drawImage(img, dx, dy, dw, dh);
                     };
-                    img.src = d.image_url;
+                    let src = d.image_url || d.url || '';
+                    if (src && src.includes('/storage/')) {
+                        src = '{{ url("") }}' + src.substring(src.indexOf('/storage/'));
+                    }
+                    img.src = src;
                 });
             }
         }
@@ -2108,7 +2115,11 @@
                             if(loaded === toDraw.length) resolve();
                         };
                         // Support both image_url and url field names
-                        img.src = dec.image_url || dec.url || '';
+                        let src = dec.image_url || dec.url || '';
+                        if (src && src.includes('/storage/')) {
+                            src = '{{ url("") }}' + src.substring(src.indexOf('/storage/'));
+                        }
+                        img.src = src;
                     });
                 });
             }
@@ -2237,8 +2248,9 @@
                     btnPublish.disabled = true;
 
                     try {
-                        const finalDataUrl = finalCanvas.toDataURL('image/png', 1.0);
-                        const res = await fetch(`{{ url('/api/photobooth/publish') }}`, {
+                        const finalCanvas = document.getElementById('final-canvas');
+                        const finalDataUrl = finalCanvas.toDataURL('image/png');
+                        const res = await fetch('{{ url("/api/photobooth/publish") }}', {
                             method: 'POST',
                             credentials: 'same-origin',
                             headers: {
@@ -2287,7 +2299,7 @@
         btnDownload.addEventListener('click', async () => {
             if (state.mode !== 'pro') {
                 try {
-                    const res = await fetch('/api/photobooth/download-usage', {
+                    const res = await fetch('{{ url('/api/photobooth/download') }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2295,11 +2307,11 @@
                         }
                     });
                     const data = await res.json();
-                    if (!data.success) {
+                    if (!data.allowed) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Batas Tercapai',
-                            text: 'Mode Demo hanya dapat mengunduh 1 foto. Upgrade ke Pro untuk unduhan tanpa batas!',
+                            text: data.message || 'Mode Demo hanya dapat mengunduh 1 foto. Upgrade ke Pro untuk unduhan tanpa batas!',
                             background: localStorage.getItem('theme') === 'dark' ? '#111827' : '#fff',
                             color: localStorage.getItem('theme') === 'dark' ? '#fff' : '#000'
                         });
@@ -2310,20 +2322,24 @@
                 }
             }
             
-            const originalHTML = btnDownload.innerHTML;
-            btnDownload.innerHTML = `<svg style="animation: spin 1s linear infinite; height: 1.2rem; width: 1.2rem; margin-right: 8px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...`;
-            btnDownload.disabled = true;
-
-            setTimeout(() => {
+            try {
                 const canv = document.getElementById('final-canvas');
                 const link = document.createElement('a');
                 link.download = `hustlespace-${Date.now()}.png`;
-                link.href = canv.toDataURL('image/png', 1.0);
+                link.href = canv.toDataURL('image/png');
+                document.body.appendChild(link);
                 link.click();
-                
-                btnDownload.innerHTML = originalHTML;
-                btnDownload.disabled = false;
-            }, 800);
+                document.body.removeChild(link);
+            } catch(err) {
+                console.error("Download failed:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal mengunduh gambar. Silakan coba lagi.',
+                    background: localStorage.getItem('theme') === 'dark' ? '#111827' : '#fff',
+                    color: localStorage.getItem('theme') === 'dark' ? '#fff' : '#000'
+                });
+            }
         });
 
         function confirmLogout() {

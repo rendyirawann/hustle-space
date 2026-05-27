@@ -728,7 +728,7 @@
             formData.append('image', file);
             formData.append('_token', '{{ csrf_token() }}');
 
-            fetch('/api/photobooth/custom-frames/upload', {
+            fetch('{{ url("/api/photobooth/custom-frames/upload") }}', {
                 method: 'POST',
                 body: formData
             }).then(r => r.json()).then(data => {
@@ -861,7 +861,7 @@
                 };
             });
 
-            fetch('/api/photobooth/custom-frames', {
+            fetch('{{ url("/api/photobooth/custom-frames") }}', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -907,14 +907,14 @@
 
         function deleteFrame(id) {
             if (!confirm('Yakin ingin menghapus frame ini?')) return;
-            fetch('/api/photobooth/custom-frames/' + id, {
+            fetch('{{ url("/api/photobooth/custom-frames") }}/' + id, {
                 method: 'DELETE',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
             }).then(r => r.json()).then(res => { if (res.success) window.location.reload(); });
         }
 
         function togglePublish(id) {
-            fetch('/api/photobooth/custom-frames/' + id + '/publish', {
+            fetch('{{ url("/api/photobooth/custom-frames") }}/' + id + '/publish', {
                 method: 'PUT',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
             }).then(r => r.json()).then(res => { if (res.success) window.location.reload(); });
@@ -952,7 +952,11 @@
             if (Array.isArray(decos)) {
                 decos.forEach(d => {
                     const z = d.zIndex_mode === 'front' ? 15 : 5;
-                    decosHtml += `<img src="${d.image_url || d.url}" style="position:absolute; left:${d.x_percent}%; top:${d.y_percent}%; width:${d.width_percent || d.w_percent}%; height:${d.height_percent || d.h_percent}%; z-index:${z}; object-fit:contain; pointer-events:none;">`;
+                    let src = d.image_url || d.url || '';
+                    if (src && src.includes('/storage/')) {
+                        src = '{{ url("") }}' + src.substring(src.indexOf('/storage/'));
+                    }
+                    decosHtml += `<img src="${src}" style="position:absolute; left:${d.x_percent}%; top:${d.y_percent}%; width:${d.width_percent || d.w_percent}%; height:${d.height_percent || d.h_percent}%; z-index:${z}; object-fit:contain; pointer-events:none;">`;
                 });
             }
 

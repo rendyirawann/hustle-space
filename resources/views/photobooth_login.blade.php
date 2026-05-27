@@ -141,13 +141,15 @@
             font-size: 0.875rem;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             body {
                 align-items: flex-start;
-                padding-top: 2rem;
+                padding: 2rem 1rem;
+                height: auto;
+                min-height: 100vh;
             }
             .login-container {
-                padding: 1rem;
+                padding: 0;
             }
             .login-card {
                 padding: 2rem 1.5rem;
