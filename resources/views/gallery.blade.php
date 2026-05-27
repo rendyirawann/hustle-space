@@ -138,8 +138,10 @@
         /* Masonry Grid */
         .gallery-container {
             padding: 0 5% 100px;
-            columns: 4 250px;
+            columns: auto 200px; /* Lebar kolom dikecilkan agar gambar tidak terlalu besar */
             column-gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .gallery-item {
