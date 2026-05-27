@@ -146,7 +146,7 @@
 
     <div class="login-container">
         <div class="logo-wrapper">
-            <img src="{{ asset('assets/hustle/logo1.png') }}" alt="HustleSpace Logo">
+            <img src="{{ asset('assets/hustle/hustle-space-logo.png') }}" alt="HustleSpace Logo">
             <h1>Photobooth Pro</h1>
             <p>Login untuk mengakses mode premium.</p>
         </div>
@@ -162,7 +162,7 @@
                 @csrf
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="admin@hustlespace.com" required autofocus>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="pro@hustlespace.com" required autofocus>
                 </div>
 
                 <div class="form-group">
@@ -177,5 +177,19 @@
         <a href="{{ route('hustle-posed.demo') }}" class="back-link">← Kembali ke Mode Demo</a>
     </div>
 
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const btn = document.querySelector('.btn-login');
+            btn.innerHTML = `<svg style="animation: spin 1s linear infinite; height: 1.2rem; width: 1.2rem; display: inline-block; vertical-align: middle; margin-right: 8px;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" style="opacity: 0.25;"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style="opacity: 0.75;"></path></svg> Memproses...`;
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+            // form will submit normally
+        });
+    </script>
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </body>
 </html>

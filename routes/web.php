@@ -53,7 +53,8 @@ Route::middleware('guest')->group(function () {
 
         if (\Illuminate\Support\Facades\Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/hustle-posed-pro');
+            // Do not use intended(), force redirect to photobooth pro
+            return redirect('/hustle-posed-pro');
         }
 
         return back()->withErrors([
@@ -62,11 +63,22 @@ Route::middleware('guest')->group(function () {
     })->name('hustle-posed.login.submit');
 });
 
+use App\Http\Controllers\Frontend\CustomFrameController;
+
 Route::middleware(['auth', 'check.subscription'])->group(function () {
     Route::get('/hustle-posed-pro', function () {
         return view('photobooth', ['mode' => 'pro']);
     })->name('hustle-posed.pro');
+
+    Route::get('/hustle-posed-pro/frame-creation', [CustomFrameController::class, 'index'])->name('hustle-posed.frame-creation');
+    Route::post('/api/photobooth/custom-frames', [CustomFrameController::class, 'store']);
+    Route::post('/api/photobooth/custom-frames/upload', [CustomFrameController::class, 'uploadImage']);
+    Route::delete('/api/photobooth/custom-frames/{id}', [CustomFrameController::class, 'destroy']);
+    Route::put('/api/photobooth/custom-frames/{id}/publish', [CustomFrameController::class, 'togglePublish']);
 });
+
+Route::get('/api/photobooth/custom-frames', [CustomFrameController::class, 'getList']);
+
 
 // Photobooth internal API limits
 use App\Http\Controllers\Frontend\PhotoboothController;
@@ -129,6 +141,14 @@ Route::middleware(['auth', 'forbid-banned-user'])->group(function () {
     Route::resource('/admin/my-security', SecurityController::class);
     Route::post('/admin/my-security', [SecurityController::class, 'store'])->name('change.password');
     Route::post('/admin/my-security/logout-other-devices', [SecurityController::class, 'logoutOtherDevices'])->name('security.logout-other-devices');
+    
+    // Override logout route redirect
+    Route::post('/hustle-posed/logout', function (\Illuminate\Http\Request $request) {
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/hustle-posed');
+    })->name('hustle-posed.logout');
 
     Route::get('/admin/my-activity', [ActivityController::class, 'index'])->name('my-activity.index');
     Route::get('/admin/mget-my-activity', [ActivityController::class, 'getActivity'])->name('get-my-activity');
