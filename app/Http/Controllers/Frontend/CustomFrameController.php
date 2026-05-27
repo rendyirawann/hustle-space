@@ -28,10 +28,10 @@ class CustomFrameController extends Controller
         $file = $request->file('image');
         
         $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs("public/frame_creation/{$userId}", $filename);
+        $path = $file->storeAs("frame_creation/{$userId}", $filename, 'public');
 
         return response()->json([
-            'url' => Storage::url($path),
+            'url' => asset('storage/' . $path),
             'path' => $path
         ]);
     }

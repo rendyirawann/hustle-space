@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Frame Creator — HustleSpace Photobooth</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary: #5544ff;
@@ -545,17 +546,19 @@
                     <div id="frameListContainer">
                         @foreach($frames as $f)
                         <div class="frame-item" id="frame-row-{{$f->id}}">
-                            <div class="frame-item-icon">🎨</div>
+                            <div class="frame-item-icon" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="previewSavedFrame({{ $f->layout }}, '{{ $f->base_theme }}', {{ empty($f->decorations) ? '[]' : (is_string($f->decorations) ? $f->decorations : json_encode($f->decorations)) }})" title="Lihat Preview">🎨</div>
                             <div class="frame-item-info">
                                 <div class="frame-item-name">{{ $f->name }}</div>
                                 <div class="frame-item-meta">{{ $f->layout }} Foto · {{ $f->base_theme }}</div>
                             </div>
                             <div class="frame-item-actions">
                                 <button class="btn btn-sm {{ $f->is_public ? 'btn-success-soft' : 'btn-ghost' }}"
-                                    onclick="togglePublish({{$f->id}})">
-                                    {{ $f->is_public ? '🌐' : '🔒' }}
+                                    onclick="togglePublish({{$f->id}})"
+                                    title="{{ $f->is_public ? 'Jadikan Privat' : 'Publikasikan ke semua orang' }}"
+                                    style="min-width: 80px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                    {!! $f->is_public ? '🌐 <span>Publik</span>' : '🔒 <span style="opacity:0.7">Privat</span>' !!}
                                 </button>
-                                <button class="btn btn-danger-soft btn-sm" onclick="deleteFrame({{$f->id}})">
+                                <button class="btn btn-danger-soft btn-sm" onclick="deleteFrame({{$f->id}})" title="Hapus Frame">
                                     🗑
                                 </button>
                             </div>
@@ -589,7 +592,7 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>© 2026 <a href="/">HustleSpace</a>. All rights reserved.</p>
+        <p>&copy; {{ date('Y') }} <a href="/">HustleSpace</a>. All rights reserved.</p>
         <p style="font-size:0.72rem; color:var(--muted);">Custom Frame Creator · Pro Mode Only</p>
     </footer>
 
@@ -703,12 +706,22 @@
         function handleUpload(input) {
             if (!input.files || input.files.length === 0) return;
             if (decorations.length >= 4) {
-                alert('Maksimal 4 gambar dekorasi!');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Maksimal 4 gambar',
+                    text: 'Hanya diperbolehkan maksimal 4 gambar dekorasi.',
+                    background: '#1c1c28', color: '#f0f0f8'
+                });
                 return;
             }
             const file = input.files[0];
             if (file.size > 256 * 1024) {
-                alert('Ukuran file maksimal 256KB!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ukuran Terlalu Besar',
+                    text: 'Ukuran file maksimal 256KB!',
+                    background: '#1c1c28', color: '#f0f0f8'
+                });
                 return;
             }
             const formData = new FormData();
@@ -720,7 +733,14 @@
                 body: formData
             }).then(r => r.json()).then(data => {
                 if (data.url) { addDecorationToCanvas(data.url); }
-            }).catch(() => alert('Gagal mengupload gambar.'));
+            }).catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Upload Gagal',
+                    text: 'Gagal mengupload gambar.',
+                    background: '#1c1c28', color: '#f0f0f8'
+                });
+            });
             input.value = '';
         }
 
@@ -814,7 +834,15 @@
         // ── Save Frame ───────────────────────────────────────────────────
         function saveFrame() {
             const name = document.getElementById('frameName').value.trim();
-            if (!name) { alert('Nama frame wajib diisi!'); return; }
+            if (!name) { 
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nama Kosong',
+                    text: 'Nama frame wajib diisi!',
+                    background: '#1c1c28', color: '#f0f0f8'
+                });
+                return; 
+            }
 
             const btn = document.getElementById('saveBtn');
             btn.disabled = true;
@@ -845,15 +873,33 @@
                 })
             }).then(r => r.json()).then(res => {
                 if (res.success) {
-                    alert('✅ Frame berhasil disimpan!');
-                    window.location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Frame berhasil disimpan!',
+                        background: '#1c1c28', color: '#f0f0f8',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
-                    alert('Gagal: ' + (res.message || 'Unknown error'));
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Disimpan',
+                        text: res.message || 'Unknown error',
+                        background: '#1c1c28', color: '#f0f0f8'
+                    });
                     btn.disabled = false;
                     btn.innerHTML = '💾 Simpan Frame';
                 }
             }).catch(() => {
-                alert('Terjadi kesalahan server.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Server',
+                    text: 'Terjadi kesalahan pada server.',
+                    background: '#1c1c28', color: '#f0f0f8'
+                });
                 btn.disabled = false;
                 btn.innerHTML = '💾 Simpan Frame';
             });
@@ -872,6 +918,79 @@
                 method: 'PUT',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
             }).then(r => r.json()).then(res => { if (res.success) window.location.reload(); });
+        }
+
+        function previewSavedFrame(layout, themeId, decos) {
+            const bg = themeBgs[themeId] || '#fff';
+            let rows = 1, cols = 1;
+            if (layout === 2) { rows = 2; }
+            if (layout === 4) { rows = 2; cols = 2; }
+
+            const padP = 7; 
+            const gapP = 3; 
+            const btmP = 9; 
+
+            const slotW_p = (100 - padP*2 - gapP*(cols-1)) / cols;
+            const slotH_p = (100 - padP - btmP - gapP*(rows-1)) / rows;
+
+            let slotsHtml = '';
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const left = padP + c*(slotW_p + gapP);
+                    const top = padP + r*(slotH_p + gapP);
+                    slotsHtml += `
+                        <div style="position:absolute; background:rgba(0,0,0,0.12); border:1.5px dashed rgba(255,255,255,0.2); border-radius:5px;
+                                    display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.3); font-size:0.7rem; font-weight:600;
+                                    left:${left}%; top:${top}%; width:${slotW_p}%; height:${slotH_p}%; z-index:10;">
+                            Foto ${r*cols+c+1}
+                        </div>
+                    `;
+                }
+            }
+
+            let decosHtml = '';
+            if (Array.isArray(decos)) {
+                decos.forEach(d => {
+                    const z = d.zIndex_mode === 'front' ? 15 : 5;
+                    decosHtml += `<img src="${d.image_url || d.url}" style="position:absolute; left:${d.x_percent}%; top:${d.y_percent}%; width:${d.width_percent || d.w_percent}%; height:${d.height_percent || d.h_percent}%; z-index:${z}; object-fit:contain; pointer-events:none;">`;
+                });
+            }
+
+            // Theme text color mapping (mirrors the actual theme text colors)
+            const tColorMap = {
+                minimal_clean:'#444', classic_white:'#333', purple_vibes:'#4a0080',
+                nature_green:'#1a5c2a', elegant_gold:'#7a5c00', daily_film:'#ffffff',
+                pastel_dream:'#7b2d8b', party_time:'#ffffff', grid_tape:'#5c3d1e',
+                soft_beige:'#5c3d1e', blue_modern:'#003a6b', black_film2:'#ffffff',
+                floral:'#8b1a4a', fun_doodle:'#333333', simple_black:'#ffffff',
+                purple_grid:'#4a0080', film_strip4:'#dddddd', cute_pastel:'#b85c7a',
+                green_garden:'#2d5a1b', kraft:'#3d2200', colorful_pop:'#333333',
+            };
+            const tColor = tColorMap[themeId] || '#000000';
+
+            const html = `
+                <div style="width:280px; height:420px; margin:20px auto; position:relative; background:${bg}; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+                    ${slotsHtml}
+                    ${decosHtml}
+                    <div style="position:absolute; bottom:14px; left:0; right:0; text-align:center; z-index:20;">
+                        <div style="font-weight:bold; font-size:16px; font-family:'Inter',sans-serif; color:${tColor};">HustleSpace</div>
+                        <div style="font-size:8px; font-family:'Inter',sans-serif; color:${tColor}; opacity:0.65; margin-top:2px;">Capture. Create. Share.</div>
+                    </div>
+                </div>
+            `;
+
+            Swal.fire({
+                title: 'Preview Frame',
+                html: html,
+                background: '#1c1c28',
+                color: '#f0f0f8',
+                showConfirmButton: true,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#5544ff',
+                customClass: {
+                    popup: 'preview-swal'
+                }
+            });
         }
     </script>
 

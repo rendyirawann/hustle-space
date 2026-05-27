@@ -812,7 +812,7 @@
                     </button>
                 </form>
             @else
-                <div class="promo-banner"><span>✨</span> Level up your moments with HustleSpace!</div>
+                <a href="{{ auth()->check() ? url('/hustle-posed-pro') : url('/#pricing') }}" class="promo-banner" style="text-decoration:none; cursor:pointer;"><span>✨</span> Level up your moments with HustleSpace!</a>
             @endif
             
             <button id="themeToggle" class="theme-toggle"><span class="icon-light">🌙</span></button>
