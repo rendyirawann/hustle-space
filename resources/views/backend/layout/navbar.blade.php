@@ -15,8 +15,8 @@
 									</button>
 									<!--end::Aside toggle-->
 									<!--begin::Header Logo-->
-									<a href="index.html">
-										<img alt="Logo" src="{{ asset('assets/media/logos/default-small.svg') }}" class="h-30px" />
+									<a href="{{ route('admin.dashboard') }}">
+										<img alt="Logo" src="{{ asset('assets/hustle/hustle-space-logo.png') }}" class="h-30px" />
 									</a>
 									<!--end::Header Logo-->
 								</div>
@@ -44,54 +44,23 @@
 											<h3 class="text-white fw-semibold px-9 mt-6 mb-6">Notifications <span class="fs-8 opacity-75 ps-3">4 recent</span></h3>
 										</div>
 										<div class="scroll-y mh-325px my-5 px-8">
-											<!-- Notification Item 1 -->
+											@forelse($recentActivities as $activity)
 											<div class="d-flex flex-stack py-4">
 												<div class="d-flex align-items-center">
 													<div class="symbol symbol-35px me-4">
-														<span class="symbol-label bg-light-primary"><i class="ki-duotone ki-user-plus text-primary fs-2"><span class="path1"></span><span class="path2"></span></i></span>
+														<span class="symbol-label bg-light"><i class="{{ $activity['icon'] }} fs-2"><span class="path1"></span><span class="path2"></span></i></span>
 													</div>
 													<div class="mb-0 me-2">
-														<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bold">Ada yang join plan</a>
-														<div class="text-gray-500 fs-7">Baru saja</div>
+														<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bold">{{ $activity['message'] }}</a>
+														<div class="text-gray-500 fs-7">{{ \Carbon\Carbon::parse($activity['time'])->diffForHumans() }}</div>
 													</div>
 												</div>
 											</div>
-											<!-- Notification Item 2 -->
-											<div class="d-flex flex-stack py-4">
-												<div class="d-flex align-items-center">
-													<div class="symbol symbol-35px me-4">
-														<span class="symbol-label bg-light-success"><i class="ki-duotone ki-picture text-success fs-2"><span class="path1"></span><span class="path2"></span></i></span>
-													</div>
-													<div class="mb-0 me-2">
-														<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bold">Ada yang publish moment</a>
-														<div class="text-gray-500 fs-7">5 menit lalu</div>
-													</div>
-												</div>
+											@empty
+											<div class="text-center py-4 text-muted">
+												Belum ada aktivitas terbaru.
 											</div>
-											<!-- Notification Item 3 -->
-											<div class="d-flex flex-stack py-4">
-												<div class="d-flex align-items-center">
-													<div class="symbol symbol-35px me-4">
-														<span class="symbol-label bg-light-info"><i class="ki-duotone ki-color-swatch text-info fs-2"><span class="path1"></span><span class="path2"></span></i></span>
-													</div>
-													<div class="mb-0 me-2">
-														<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bold">Ada yang create frame</a>
-														<div class="text-gray-500 fs-7">12 menit lalu</div>
-													</div>
-												</div>
-											</div>
-											<!-- Notification Item 4 -->
-											<div class="d-flex flex-stack py-4">
-												<div class="d-flex align-items-center">
-													<div class="symbol symbol-35px me-4">
-														<span class="symbol-label bg-light-warning"><i class="ki-duotone ki-share text-warning fs-2"><span class="path1"></span><span class="path2"></span></i></span>
-													</div>
-													<div class="mb-0 me-2">
-														<a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bold">Ada yang publish frame</a>
-														<div class="text-gray-500 fs-7">30 menit lalu</div>
-													</div>
-												</div>
-											</div>
+											@endforelse
 										</div>
 									</div>
 									<!--end::Menu-->
