@@ -12,8 +12,8 @@ class GalleryController extends Controller
 {
     public function index()
     {
-        // Get all published photos, latest first
-        $photos = PublishedPhoto::latest()->get();
+        // Get published photos, 15 per page
+        $photos = PublishedPhoto::with('user')->latest()->paginate(15);
         return view('gallery', compact('photos'));
     }
 

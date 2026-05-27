@@ -137,11 +137,41 @@
 
         /* Masonry Grid */
         .gallery-container {
-            padding: 0 5% 100px;
-            columns: auto 200px; /* Lebar kolom dikecilkan agar gambar tidak terlalu besar */
+            padding: 0 2% 50px;
+            columns: auto 250px; /* Diperbesar sedikit agar pas dengan layar penuh */
             column-gap: 1.5rem;
-            max-width: 1200px;
+            max-width: 100%; /* Dibuat lebar penuh agar dari pinggir */
             margin: 0 auto;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            padding: 0;
+            margin: 0;
+        }
+        .page-item .page-link {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .page-item.active .page-link {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .page-item.disabled .page-link {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .page-link:hover:not(.disabled) {
+            background: var(--border-color);
         }
 
         .gallery-item {
@@ -306,6 +336,11 @@
             <p>Belum ada foto yang dipublish. Jadilah yang pertama!</p>
         </div>
         @endforelse
+    </div>
+
+    <!-- Pagination -->
+    <div style="display: flex; justify-content: flex-end; padding: 0 2% 50px;">
+        {{ $photos->links('pagination::bootstrap-4') }}
     </div>
 
     <!-- Lightbox -->
